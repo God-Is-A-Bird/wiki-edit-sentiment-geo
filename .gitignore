@@ -205,7 +205,3 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
-
-# Project Specific Files
-part1.commit-semantic-evolution/data/articles.json
-part1.commit-semantic-evolution/data/revisions.json
