@@ -1,0 +1,39 @@
+SELECT DISTINCT ?item ?itemLabel ?coord ?article WHERE {
+  {
+    {
+      {
+        ?item wdt:P625 ?coord;
+          (wdt:P131*) wd:Q74054.
+      }
+      UNION
+      {
+        ?item wdt:P159 ?hqGeo.
+        ?hqGeo (wdt:P131*) wd:Q74054.
+      }
+    }
+    UNION
+    {
+      {
+        ?item wdt:P625 ?coord;
+          (wdt:P131*) wd:Q249994.
+      }
+      UNION
+      {
+        ?item wdt:P159 ?hqGeo.
+        ?hqGeo (wdt:P131*) wd:Q249994.
+      }
+    }
+  }
+  OPTIONAL {
+    ?zhLink schema:about ?item;
+      schema:isPartOf <https://zh.wikipedia.org/>.
+  }
+  OPTIONAL {
+    ?enLink schema:about ?item;
+      schema:isPartOf <https://en.wikipedia.org/>.
+  }
+  BIND(COALESCE(?zhLink, ?enLink) AS ?article)
+  FILTER(BOUND(?article))
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "zh,en". }
+}
+LIMIT 1
