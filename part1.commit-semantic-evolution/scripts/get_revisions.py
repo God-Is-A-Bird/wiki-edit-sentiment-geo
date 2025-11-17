@@ -90,12 +90,36 @@ def get_revisions():
 
             # Determine if the user is an IP address
             is_ip = _is_ip_address(user)
+            country = None
+            geo_coords = None
+
+            if is_ip:
+                try:
+                    # Geolocation lookup
+                    ip_for_api = user.strip("[]")
+                    geo_url = f"http://ip-api.com/json/{ip_for_api}"
+                    geo_req = urllib.request.Request(geo_url, headers={"User-Agent": "MyResearchBot/1.0 (Researcher)"})
+                    with urllib.request.urlopen(geo_req) as geo_response:
+                        geo_data = json.loads(geo_response.read().decode())
+                        if geo_data.get("status") == "success":
+                            country = geo_data.get("country")
+                            geo_coords = {
+                                "lat": geo_data.get("lat"),
+                                "lon": geo_data.get("lon")
+                            }
+                        else:
+                            country = "Lookup Failed"
+                except Exception as e:
+                    print(f"  Could not fetch geolocation for {user}: {e}")
+                    country = "Error"
 
             article_revisions["revisions"].append({
                 "user": user,
                 "timestamp": timestamp,
                 "diff": diff,
-                "is_ip": is_ip # Add the new field
+                "is_ip": is_ip,
+                "country": country,
+                "geo_coords": geo_coords
             })
         
         all_revisions_data.append(article_revisions)
